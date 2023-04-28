@@ -16,28 +16,26 @@ fa = f(a)
 fb = f(b)
 
 for i in range(0, 100):
-    x0 = ((a * f(b)) - (b * f(a))) / (f(b) - f(a))
+    x_0 = ((a * f(b)) - (b * f(a))) / (f(b) - f(a))
 
-    fx = f(x0)
+    fx = f(x_0)
 
     if fa < 0:
         if fx < 0 :
-            a = x0
+            a = x_0
             fa = fx
         elif fx > 0 :
-            b = x0
-            fb = fx 
-    elif fa > 0:
+            b = x_0
+            fb = fx
+    else:
         if fx < 0 :
-            b = x0
+            b = x_0
             fb = fx
         elif fx > 0 :
-            a = x0
+            a = x_0
             fa = fx
-    else:
-        print("Erro")
 
-    # print(f"{x0}")
-    print(f"{i + 1} : [{a}, {b}] ==> {(a + b) / 2} ==> f: {f(x0)} ==> e: {b - a}")
-    if abs(b - a) < e1 or abs(f(x0)) < e2:
+    # print(f"{x_0}")
+    print(f"{i + 1} : [{a}, {b}] ==> {(a + b) / 2} ==> f: {f(x_0)} ==> e: {b - a}")
+    if abs(b - a) < e1 or abs(f(x_0)) < e2:
         break
