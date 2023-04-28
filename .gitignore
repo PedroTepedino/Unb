@@ -1,0 +1,11 @@
+*.pdf
+
+# animation
+media/
+*.mp4
+
+# python
+/__pycache__
+*.pyc
+
+
