@@ -1,5 +1,6 @@
 import numpy as np
 
+# Metodo da bicessao
 def f(x):
     # return (x * np.exp(x)) -1 
     return ( x * x * x ) - ( 2 * x * x ) - ( 20 * x ) + 30
