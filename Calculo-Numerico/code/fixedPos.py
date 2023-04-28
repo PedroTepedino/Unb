@@ -26,14 +26,16 @@ for i in range(0, 100):
             fa = fx
         elif fx > 0 :
             b = x0
-            fb = fx
-    else:
+            fb = fx 
+    elif fa > 0:
         if fx < 0 :
             b = x0
             fb = fx
         elif fx > 0 :
             a = x0
             fa = fx
+    else:
+        print("Erro")
 
     # print(f"{x0}")
     print(f"{i + 1} : [{a}, {b}] ==> {(a + b) / 2} ==> f: {f(x0)} ==> e: {b - a}")
