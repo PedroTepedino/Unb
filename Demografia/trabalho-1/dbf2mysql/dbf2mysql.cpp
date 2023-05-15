@@ -230,7 +230,6 @@ std::vector<col> readDBFInput( ifstream* stream)
 
 void WriteCSV(std::vector<col> data, ofstream* stream)
 {
-    cout << "<--->" << endl;
     string aux = "";
     for (int i = 0; i < data.size(); i++)
         aux += "\"" + data[i].descriptor + "\";" ;      
@@ -256,6 +255,36 @@ void WriteCSV(std::vector<col> data, ofstream* stream)
     }
 }
 
+string ToCSV(std::vector<col> data)
+{
+    string aux = "";
+    for (int i = 0; i < data.size(); i++)
+        aux += "\"" + data[i].descriptor + "\";" ;      
+    aux.pop_back();
+    aux.push_back('\n');
+
+    for (int i = 0; i < data[0].data.size(); i++)
+    {
+        for(int j = 0; j < data.size(); j++)
+        {
+            aux += "\"" + data[j].data[i] + "\";";
+            
+        }
+        aux.pop_back();
+        aux.push_back('\n');
+    }
+    return aux;
+}
+
+string ToMysql(std::vector<col> data, string tableName)
+{
+    string stream = "";
+
+    stream += "CREATE TABLE " + tableName + "(\n";
+
+    stream += ");\n";
+}
+
 int main(int argc, char** argv)
 {
     // cout << argv[1] << " " << argv[2] <<endl;
@@ -263,9 +292,14 @@ int main(int argc, char** argv)
     std::vector<col> db = readDBFInput(&input);
     input.close();
 
+    cout << "<--->" << endl;
+
     std::ofstream output(argv[2]);
-    WriteCSV(db, &output);
+    // WriteCSV(db, &output);
+    output << ToCSV(db);
+    // cout << ToMysql(db, argv[3]);
     output.close();
+
 
     return 0;
 } 
