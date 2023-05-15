@@ -15,27 +15,26 @@ b = 1.0
 fa = f(a)
 fb = f(b)
 
+# loop de iteracao
 for i in range(0, 100):
     x_0 = ((a * f(b)) - (b * f(a))) / (f(b) - f(a))
 
-    fx = f(x_0)
+    f_x = f(x_0)
 
     if fa < 0:
-        if fx < 0 :
+        if f_x < 0 :
             a = x_0
-            fa = fx
-        elif fx > 0 :
+            fa = f_x
+        elif f_x > 0 :
             b = x_0
-            fb = fx
-    elif fa > 0:
-        if fx < 0 :
-            b = x_0
-            fb = fx
-        elif fx > 0 :
-            a = x_0
-            fa = fx
+            fb = f_x
     else:
-        print("Error")
+        if f_x < 0 :
+            b = x_0
+            fb = f_x
+        elif f_x > 0 :
+            a = x_0
+            fa = f_x
 
     # print(f"{x_0}")
     print(f"{i + 1} : [{a}, {b}] ==> {(a + b) / 2} ==> f: {f(x_0)} ==> e: {b - a}")
