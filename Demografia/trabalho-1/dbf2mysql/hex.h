@@ -1,3 +1,6 @@
+#ifndef HEX_H
+#define HEX_H
+
 #include <iostream>
 #include <iomanip>
 
@@ -33,3 +36,5 @@ inline u_int32_t HexLE32(char* _s)
            ((u_int8_t)_s[2]) << 16 |
            ((u_int8_t)_s[3]) << 32 ;
 }
+
+#endif

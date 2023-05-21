@@ -1,7 +1,12 @@
+#ifndef BIT_H
+#define BIT_H
+
 #include <iostream>
 #include <bitset>
 #include <string>
 #include <iomanip>
+#include <algorithm>
+#include <map>
 
 typedef unsigned char uchar;
 
@@ -59,14 +64,65 @@ const std::string ucharByteTable[] = {
     "11111000", "11111001", "11111010", "11111011", "11111100", "11111101", "11111110", "11111111",
 };
 
+
 static inline const uchar rb(uchar _c)
 {
     return revertByteTable[(short)_c];
 }
 
-static inline const std::string c2b(uchar _c)
+static inline const std::string b(uchar _c)
 {
     return ucharByteTable[(short)_c];
+}
+
+static inline const std::string b(uchar _c, std::string sep)
+{
+    std::string s = ucharByteTable[(short)_c]; 
+    s.insert(4, sep);
+    return s;
+}
+
+static const std::string b(std::string _s)
+{
+    std::string hex = "";
+    for(auto c: _s)
+        hex += b((uchar)c);
+    return hex;
+}
+
+static inline const std::string lb(uchar _c)
+{
+    return ucharByteTable[(short)rb(_c)];
+} 
+
+static const std::string lb(std::string _s)
+{
+    std::string hex = "";
+    for (int i = 0; i < _s.size(); i++)
+        hex.insert(0, lb((uchar)_s[i]));
+    return hex;
+}
+
+static const char bh(std::string _s)
+{
+    char c = 0X00;
+    for(int i = 0; i < _s.length(); i++)
+    {
+        if (_s[_s.length() - 1 - i] == '1')
+            c |= 0x01 << i;
+    }
+    return c;
+}
+
+static const int bit2int(std::string _s)
+{
+    int num = 0;
+    for(int i = 0; i < _s.length(); i++)
+    {
+        if (_s[_s.length() - 1] == '1')
+            num |= 0x01 << i;
+    }
+    return num;
 }
 
 struct BitCharStruct 
@@ -90,3 +146,5 @@ inline BitCharStruct lbit(unsigned char _c)
 {
     return BitCharStruct(rb(_c));
 }
+
+#endif

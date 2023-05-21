@@ -1,3 +1,6 @@
+#ifndef COL_H
+#define COL_H
+
 #include <string>
 #include <vector>
 
@@ -10,3 +13,5 @@ struct col
     int filedDecimal;
     std::vector<std::string> data;
 };
+
+#endif

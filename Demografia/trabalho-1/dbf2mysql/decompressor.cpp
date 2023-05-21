@@ -5,17 +5,20 @@
 #include <vector>
 #include <iomanip>
 
-#include "hex.h"
-#include "bit.h"
+#include "decode.h"
 
 using namespace std;
+using std::cout;
 
 typedef unsigned char uchar;
 
 int header(ifstream* stream)
 {
+    int lineCount = 0;
     u_int16_t headerSize = 0x0000;
     vector<char> message;
+
+    vector<char> dictionary;
 
     stream->seekg(8, ios::beg);
 
@@ -115,6 +118,7 @@ int header(ifstream* stream)
 
     int remainingBits = 8;
     vector<uchar> codes;
+    std::string checksum = "";
 
     int index = 0;
     unsigned char c = buffer[index]; // get character in current index
@@ -130,13 +134,16 @@ int header(ifstream* stream)
     if(asciiLiteral)
     {
         codes.push_back('0');
-        cout << "0 "; 
+        cout << lineCount << " : 0 "; 
+        checksum.push_back('0');
     }
     else
     {
         codes.push_back('1');
-        cout << "1 ";
+        cout << lineCount << " : 1 ";
+        checksum.push_back('1');
     }
+    lineCount ++;
     
 
     c = c >> 1; // discard tested bit (firts bit)
@@ -147,10 +154,14 @@ int header(ifstream* stream)
     cout << std::dec << " - " << remainingBits << endl;
     // cout << lbit(c) << "  ";
     message.push_back(c);
+    dictionary.push_back(c);
+    checksum.append(b(rb(c)));
     
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 25; i++)
     {
         c = c >> 8; // discard byte
+
+        cout << endl << "remaining bits : " << remainingBits << endl;
 
         c = ((uchar)buffer[index]) >> (8 - remainingBits);
         index++;
@@ -165,30 +176,83 @@ int header(ifstream* stream)
         if(asciiLiteral)
         {
             codes.push_back('0');
-            cout << "0 "; 
+            cout << lineCount << " : 0 "; 
+            checksum.push_back('0');
         }
         else
         {
             codes.push_back('1');
-            cout << "1 ";
+            cout << lineCount << " : 1 ";
+            checksum.push_back('1');
         }
+        lineCount ++;
 
-        c = c >> 1;
-        remainingBits--;
-        if (remainingBits < 0)
+        if (asciiLiteral)
         {
-            remainingBits = 7;
-            index++;
+            c = c >> 1;
+            remainingBits--;
+            if (remainingBits < 0)
+            {
+                remainingBits = 7;
+                index++;
+            }
+            else
+            {
+                c |= ((uchar)buffer[index]) << remainingBits;
+            }
+
+            cout << lbit(c);
+            cout  << " - " << hex(c);
+            cout << std::dec << " - " << remainingBits << endl;
+            // cout << lbit(c) << "  ";
+            message.push_back(c);
+            dictionary.insert(dictionary.begin(), c);
+
+            checksum.append(b(rb(c)));
         }
         else
         {
-            c |= ((uchar)buffer[index]) << remainingBits;
+            cout << endl << "Index : " << index  << " - " << bit(buffer[index]) << endl;
+            remainingBits--;
+            // cout << endl << "Sequence  Detected !!" << endl;
+            // cout << "Decoding: " << endl;
+            int preIndex = index;
+            lengthOffsetPair pair = Decode(buffer, index, remainingBits);
+            remainingBits -= pair.bits;
+            remainingBits += (index - preIndex) * 8;
+            if (remainingBits < 0)
+                remainingBits += 8;
+            // cout << "length: " <<  pair.length << endl;
+            // cout << "offset: " <<  pair.offset << endl;
+            cout << pair.dLength 
+                 << " " 
+                 <<  pair.dOfset 
+                 << " " 
+                 << pair.dOoffsseett 
+                 << " - (" 
+                 << pair.length 
+                 << " : " 
+                 << pair.offset 
+                 << ") - "
+                 << pair.bits
+                 << " -> "
+                 << remainingBits 
+                 << endl;
+            checksum.append(pair.dLength + pair.dOfset + pair.dOoffsseett );
+
+            // cout << endl;
+            // cout << endl << "index: " << index << endl;
+
+            // for (auto d: dictionary)
+            //     cout << hex(d) << " ";
+            // cout << endl;
+            
+            for (int i = 0; i < pair.length; i++)
+            {
+                message.push_back(dictionary[pair.offset - i]);
+            }
+
         }
-        cout << lbit(c);
-        cout  << " - " << hex(c);
-        cout << std::dec << " - " << remainingBits << endl;
-        // cout << lbit(c) << "  ";
-        message.push_back(c);
     }
 
         // c = c >> 8; // discard byte
@@ -234,18 +298,40 @@ int header(ifstream* stream)
 
     cout << endl;
 
-    string rebuiltStream = "";
-    for (int i = 0; i < message.size(); i++)
+    std::string aux = "";    
+    
+    vector<u_int8_t> check, sum;
+    for (int i = 0; i < checksum.size(); i++)
     {
-        rebuiltStream.push_back(codes[i] == 0x01 ? '1' : '0');
-        rebuiltStream.append(c2b(rb(message[i])));
+        aux += checksum[i]; 
+
+        if ((i + 1) % 8 == 0)
+        {
+            check.push_back(bh(aux));
+            aux = "";
+        }
     }
+
+    for (int i = 0; i < check.size(); i++)
+        sum.push_back(rb(buffer[i]));
+
+    cout << "CHECKSUM :" << endl;
+
+    for (int i = 0; i < check.size(); i++)
+        cout << i
+             << " : "
+             << b(check[i], " ") 
+             << " - " 
+             << b(sum[i], " ") 
+             << " | diff : " 
+             << b(check[i] ^ sum[i], " ")
+             << endl;
 
     cout << endl << endl;
 
-    for (int i = 0; i < rebuiltStream.size(); i++)
+    for (int i = 0; i < checksum.size(); i++)
     {
-        cout << rebuiltStream[i];
+        cout << checksum[i];
 
         if ((i + 1) % 64 == 0)
             cout << endl;
@@ -256,6 +342,31 @@ int header(ifstream* stream)
         else if ((i + 1) % 4 == 0)
             cout << " ";   
     }
+
+    cout << endl << endl;
+
+    // string rebuiltStream = "";
+    // for (int i = 0; i < message.size(); i++)
+    // {
+    //     rebuiltStream.push_back(codes[i] == 0x01 ? '1' : '0');
+    //     rebuiltStream.append(b(rb(message[i])));
+    // }
+
+    // cout << endl << endl;
+
+    // for (int i = 0; i < rebuiltStream.size(); i++)
+    // {
+    //     cout << rebuiltStream[i];
+
+    //     if ((i + 1) % 64 == 0)
+    //         cout << endl;
+    //     else if ((i + 1) % 32 == 0)
+    //         cout << "    ";
+    //     else if ((i + 1) % 8 == 0)
+    //         cout << "  ";
+    //     else if ((i + 1) % 4 == 0)
+    //         cout << " ";   
+    // }
 
     cout << endl << endl;
     // cout << "<----------->";
@@ -286,18 +397,18 @@ int header(ifstream* stream)
     // cout << endl << endl;
 
     
-    for (int i = 0; i < bufferSize; i++)
-    {
-        if (i < index)
-            cout << "---- ----  ";
-        else
-            cout << lbit(buffer[i]) << "  ";
-        if ((i + 1) % 8 == 0)
-            cout << endl;
-        else if ((i + 1) % 4 == 0)
-            cout << "  ";
-    }
-    cout << endl << std::dec;
+    // for (int i = 0; i < bufferSize; i++)
+    // {
+    //     if (i < index)
+    //         cout << "---- ----  ";
+    //     else
+    //         cout << lbit(buffer[i]) << "  ";
+    //     if ((i + 1) % 8 == 0)
+    //         cout << endl;
+    //     else if ((i + 1) % 4 == 0)
+    //         cout << "  ";
+    // }
+    // cout << endl << std::dec;
 
     // for (int i = 0; i < bufferSize; i++)
     // {
@@ -317,6 +428,7 @@ int header(ifstream* stream)
 
 
     delete buffer;
+
 
 
 

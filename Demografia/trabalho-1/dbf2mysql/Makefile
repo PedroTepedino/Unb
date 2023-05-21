@@ -1,12 +1,17 @@
 CC=g++
 CFLAGS= -I -std=c++14
+DEPS= decode.h bit.h hex.h
+OBJS= decode.o
 
-all: dbf2mysql blast
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
-dbf2mysql: dbf2mysql.cpp
+all: dbf2mysql blast 
+
+dbf2mysql: dbf2mysql.cpp 
 	$(CC) $(CFLAGS) -o $@ $^
 
-blast: decompressor.cpp
+blast: decompressor.cpp $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:

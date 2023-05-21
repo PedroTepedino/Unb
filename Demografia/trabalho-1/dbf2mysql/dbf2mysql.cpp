@@ -5,6 +5,7 @@
 #include <bitset>
 #include <string>
 #include <iomanip>
+// #include <algorithm>
 
 #include "hex.h"
 #include "col.h"
@@ -18,6 +19,19 @@ struct Date {
     int month;
     int day;
 };
+
+// std::string toUpper( std::string s)
+// {
+//     std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+//     return s;
+// }
+
+// std::string toLower( std::string s)
+// {
+//     std::transform(s.begin(), s.end(), s.begin(), ::toLower);
+//     return s;
+// }
+
 
 std::vector<col> readDBFInput( ifstream* stream)
 {    
@@ -276,13 +290,32 @@ string ToCSV(std::vector<col> data)
     return aux;
 }
 
+std::string TranslateType(char _t, int size)
+{
+    switch (_t)
+    {
+        case 'C':
+            if (size > 1)
+                return "VARCHAR(" + to_string(size) + ")";
+            else
+                return "CHAR(1)";
+        case 'D': // TODO: Complete other types
+            return "null";
+    }
+    return "null";
+}
+
 string ToMysql(std::vector<col> data, string tableName)
 {
     string stream = "";
 
-    stream += "CREATE TABLE " + tableName + "(\n";
+    stream += "CREATE TABLE " + tableName /*toUpper(tableName)*/ + "(\n";
+    
+    for (int i = 0; i < data.size(); i++)
+        stream += "\t " + data[i].descriptor /*toLower(data[i].descriptor)*/ + ' ' + TranslateType(data[i].fieldType, data[i].fieldSize) +",\n";
 
     stream += ");\n";
+    return stream;
 }
 
 int main(int argc, char** argv)
@@ -298,6 +331,7 @@ int main(int argc, char** argv)
     // WriteCSV(db, &output);
     output << ToCSV(db);
     // cout << ToMysql(db, argv[3]);
+    // output << ToMysql(db, argv[3]);
     output.close();
 
 
