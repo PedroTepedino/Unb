@@ -295,10 +295,11 @@ std::string TranslateType(char _t, int size)
     switch (_t)
     {
         case 'C':
-            if (size > 1)
-                return "VARCHAR(" + to_string(size) + ")";
-            else
-                return "CHAR(1)";
+            return "CHAR(" + to_string(size) + ")";
+            // if (size > 1)
+            //     return "VARCHAR(" + to_string(size) + ")";
+            // else
+            //     return "CHAR(1)";
         case 'D': // TODO: Complete other types
             return "null";
     }
@@ -312,9 +313,12 @@ string ToMysql(std::vector<col> data, string tableName)
     stream += "CREATE TABLE " + tableName /*toUpper(tableName)*/ + "(\n";
     
     for (int i = 0; i < data.size(); i++)
-        stream += "\t " + data[i].descriptor /*toLower(data[i].descriptor)*/ + ' ' + TranslateType(data[i].fieldType, data[i].fieldSize) +",\n";
+        stream += "\t " + data[i].descriptor /*toLower(data[i].descriptor)*/ + ' ' + TranslateType(data[i].fieldType, data[i].fieldSize) + ",\n";
 
     stream += ");\n";
+
+
+
     return stream;
 }
 
