@@ -1,4 +1,11 @@
 *.pdf
+*.out
+*.rar
+
+# R
+**/.Rhistory
+**/.RData
+**/.Rprofile
 
 # animation
 media/
@@ -8,4 +15,30 @@ media/
 /__pycache__
 *.pyc
 
+# Demog
+## Demog -> Random Exports
+Demografia/**/*.png
 
+## Demog -> Data
+Demografia/**/*.csv
+Demografia/**/*.xlsx
+Demografia/**/*.zip
+Demografia/**/*.ZIP
+Demografia/**/*.ods
+
+### Demog -> Data -> Locked
+Demografia/**/*.csv#
+Demografia/**/*.xlsx#
+
+### Demog -> Data -> Datasus
+Demografia/**/*.dbc
+Demografia/**/*.DBC
+Demografia/**/*.dbf
+Demografia/**/*.DBF
+
+Demografia/**/*.DEF
+Demografia/**/*.def
+Demografia/**/*.cnv
+Demografia/**/*.CNV
+
+Demografia/**/*.HLP
