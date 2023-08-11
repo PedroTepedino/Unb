@@ -1,6 +1,7 @@
 *.pdf
 *.out
 *.rar
+*.zip
 
 # R
 **/.Rhistory
@@ -22,6 +23,11 @@ Demografia/**/*.png
 ## Demog -> Data
 Demografia/**/*.csv
 Demografia/**/*.xlsx
+Demografia/**/*.xls
+Demografia/**/*.xls#
+Demografia/**/*.XLS
+Demografia/**/*.xml
+Demografia/trabalho-2/**/readme.txt
 Demografia/**/*.zip
 Demografia/**/*.ZIP
 Demografia/**/*.ods
@@ -42,3 +48,6 @@ Demografia/**/*.cnv
 Demografia/**/*.CNV
 
 Demografia/**/*.HLP
+
+
+SecretariaSaude/
