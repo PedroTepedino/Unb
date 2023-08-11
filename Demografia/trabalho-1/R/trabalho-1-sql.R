@@ -17,7 +17,7 @@ dbClearResult(dbListResults(conn)[[1]])
 lexis_rn <-
   dbGetQuery(conn, "select * from lexis_rn")
 lexis_nasc_rn <-
-  dbGetQuery(conn, "select * from aux_dnba_count")
+  dbGetQuery(conn, "select * from aux_dnrn_count")
 
 lexis_ba <-
   dbGetQuery(conn, "select * from lexis_ba")
@@ -60,12 +60,13 @@ lexis_grid( year_start = 2000, year_end = 2022,
   ) +
   annotate(              # Anotações nos gráficos
     "text",
-    x     = as.Date(lexis_nasc_rn$ANOCORR) ,
-    y     = 0.1,
+    x     = as.Date(lexis_nasc_rn$ANOCORR) + 20 ,
+    y     = 0.13,
     label = lexis_nasc_rn$CONT,
     size  = 3,
     colour= "blueviolet") +
-    ggtitle("Diagrama de Lexis de nascimentos e óbitos de 2000 a 2021 do Rio Grande do Norte")
+    labs( x = "Ano", y = "Idade", title = "Diagrama de Lexis de nascimentos e óbitos de 2000 a 2021 do Rio Grande do Norte") + 
+    theme(plot.margin = margin(t = 10, r = 15, b = 10, l = 10, unit = "pt"))  
 
 
 sum(filter(lexis_rn, lexis_rn$COORTE <= 2016 & lexis_rn$COORTE >= 2000)$COUNT)
